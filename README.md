@@ -1,3 +1,7 @@
+## NB!
+
+> This project is **unmaintained!** If anyone wants to take over please write to andris.reinman@gmail.com to get ownership of this repo and npm package
+
 # simpleStorage
 
 Cross-browser key-value store database to store data locally in the browser.
@@ -12,11 +16,21 @@ The module has no dependencies, you can use it as a standalone script (introduce
 
 ## Install
 
-Download [simpleStorage.js](https://github.com/andris9/simpleStorage/blob/master/simpleStorage.js) or install with bower:
+Quickest way to get up and running woulr be to use [jsDelivr CDN](http://www.jsdelivr.com/projects/simplestorage):
+
+```html
+<script src="https://cdn.jsdelivr.net/simplestorage/0.2.1/simpleStorage.min.js"></script>
+```
+
+Otherwise you can download [simpleStorage.js](https://github.com/andris9/simpleStorage/blob/master/simpleStorage.js) or install it with bower:
 
     bower install simpleStorage
 
 and include the following script in your web application: *bower_components/simpleStorage/simpleStorage.js*
+
+or install with npm
+
+    npm install simplestorage.js
 
 ## Support simpleStorage development
 
@@ -27,6 +41,13 @@ If you want to support with Bitcoins, then my wallet address is `15Z8ADxhssKUiwP
 ## Usage
 
 *simpleStorage* API is a subset of jStorage with slight modifications, so for most cases it should work out of the box if you are converting from jStorage. Main difference is between return values - if an action failed because of an error (storage full, storage not available, invalid data used etc.), you get the error object as the return value. jStorage never indicated anything if an error occurred.
+
+Possible error codes (from `err.code`):
+
+  * **"LS_NOT_AVAILABLE"** means that localStorage is not supported by this browser
+  * **"LS_DISABLE"** means that localStorage is supported by this browser but it can't be used for whatever reason (privacy mode, manual disabling etc.)
+  * **"LS_QUOTA_EXCEEDED"** means that the allocated quota for localStorage is all used up or would be if current value is stored
+  * *anything else*, no idea
 
 ### set(key, value[, options])
 
@@ -40,13 +61,18 @@ Where
 
   * **key** - the key for the value
   * **value** - value to be stored (can be any JSONeable value)
-  * **options** - optional options object. Currently only available option is `options.TTL` which can be used to set the TTL value to the key `simpleStorage.set(key, value, {TTL: 1000})`
+  * **options** - optional options object. Currently the only available option is `TTL` which sets the time-to-live (TTL) value in milliseconds for the given key/value
+
+```javascript
+// the following entry expires in 100 seconds
+simpleStorage.set(key, value, {TTL: 100000})
+```
 
 Return values
 
   * **true** - value was stored
   * **false** - value was not stored
-  * Error object - value was not stored because of an error
+  * Error object - value was not stored because of an error. See `error.code` for explanation
 
 ### get(key)
 
@@ -62,6 +88,20 @@ Where
 
 Method returns the value for a key or undefined if the key was not found.
 
+### hasKey(key)
+
+Checks if there's a value with the given key in the local storage.
+
+```javascript
+simpleStorage.hasKey(key)
+```
+
+Where
+
+  * **key** - the key to be checked
+
+Method returns true if the given key exists, false otherwise.
+
 ### deleteKey(key)
 
 Removes a value from local storage.
@@ -74,7 +114,7 @@ Return values
 
   * **true** - value was deleted
   * **false** - value was not found
-  * Error object - value was not deleted because of an error
+  * Error object - value was not deleted because of an error. See `error.code` for explanation
 
 ### setTTL(key, ttl)
 
@@ -93,7 +133,7 @@ Return values
 
   * **true** - ttl was set
   * **false** - value was not found
-  * Error object - ttl was not set because of an error
+  * Error object - ttl was not set because of an error. See `error.code` for explanation
 
 ### getTTL(key)
 
@@ -124,7 +164,7 @@ simpleStorage.flush()
 Return values
 
   * **true** - storage was flushed
-  * Error object - storage was not flushed because of an error
+  * Error object - storage was not flushed because of an error. See `error.code` for explanation
 
 ### index()
 
